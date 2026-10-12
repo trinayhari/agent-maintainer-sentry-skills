@@ -23,6 +23,7 @@ jobs:
         with:
           repository: trinayhari/agent-maintainer
           ref: cefc6ca347885a9f73bed1579327b6da512b3c1a
+          ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
@@ -48,7 +49,10 @@ jobs:
         run: |
           current_head=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)
           test "$current_head" = "$EXPECTED_HEAD" || { echo 'PR head changed; refusing stale comment'; exit 1; }
-          test -f artifacts/ci-native/summary.md || { echo 'No evidence report produced'; exit 1; }
+          if ! test -f artifacts/ci-native/summary.md; then
+            mkdir -p artifacts/ci-native
+            printf '# Native fixture evaluation — INCOMPLETE\n\nPR head: `%s`\n\nThe workflow did not produce model evidence. Inspect the Actions logs for checkout, credentials, or runner failures. No behavioral pass or release approval.\n' "$EXPECTED_HEAD" > artifacts/ci-native/summary.md
+          fi
           printf '\n[GitHub Actions run](%s/%s/actions/runs/%s) · screening evidence, not release approval.\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> artifacts/ci-native/summary.md
           gh pr comment "$PR_NUMBER" --body-file artifacts/ci-native/summary.md
       - name: Upload public evidence
