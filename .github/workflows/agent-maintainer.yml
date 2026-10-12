@@ -1,0 +1,66 @@
+name: Agent Maintainer native skill evaluation
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+concurrency:
+  group: native-skill-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  evaluate:
+    name: Paired native skill trials (screening only)
+    if: github.repository == 'trinayhari/agent-maintainer-sentry-skills' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'codex/native-skill-ci' && github.actor == 'trinayhari'
+    runs-on: macos-14
+    timeout-minutes: 25
+    environment: native-evaluation
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout trusted pinned evaluator
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: trinayhari/agent-maintainer
+          ref: cefc6ca347885a9f73bed1579327b6da512b3c1a
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Checkout exact PR source as data only
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: trinayhari/agent-maintainer-sentry-skills
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: artifacts/repos/pr-source
+          persist-credentials: false
+      - name: Compare no skill and current skill (2 tasks x 3 repetitions)
+        run: python -m agent_maintainer.pr_ci
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: Publish commit-bound findings on the PR
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          GH_REPO: trinayhari/agent-maintainer-sentry-skills
+        run: |
+          current_head=$(gh pr view "$PR_NUMBER" --json headRefOid --jq .headRefOid)
+          test "$current_head" = "$EXPECTED_HEAD" || { echo 'PR head changed; refusing stale comment'; exit 1; }
+          test -f artifacts/ci-native/summary.md || { echo 'No evidence report produced'; exit 1; }
+          printf '\n[GitHub Actions run](%s/%s/actions/runs/%s) · screening evidence, not release approval.\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> artifacts/ci-native/summary.md
+          gh pr comment "$PR_NUMBER" --body-file artifacts/ci-native/summary.md
+      - name: Upload public evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: |
+            artifacts/ci-native/result.json
+            artifacts/ci-native/ci-result.json
+            artifacts/ci-native/summary.md
+            artifacts/pr-contract/config.json
+            artifacts/pr-contract/suite.json
+          if-no-files-found: error
+          retention-days: 14
