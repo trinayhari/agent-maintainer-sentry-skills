@@ -1,6 +1,8 @@
 """Trusted Actions bridge. Credentials are scoped to separate workflow steps."""
 import argparse
 import hashlib
+import io
+import zipfile
 import json
 import os
 from pathlib import Path
@@ -112,9 +114,32 @@ def publish(body,evidence):
         with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as output:output.write(evidence['summary'])
     print('Evidence saved and PR synchronized:',status)
 
+def recover_artifacts(repo):
+    # Read only artifacts from this fixed trusted workflow, never execute contents.
+    runs=gh(f'repos/{repo}/actions/workflows/agent-maintainer-cloud.yml/runs?event=pull_request_target&per_page=30')['workflow_runs']
+    for run in runs:
+        if run['status']!='completed' or run.get('conclusion')=='success': continue
+        artifacts=gh(f'repos/{repo}/actions/runs/{run['id']}/artifacts')['artifacts']
+        for artifact in artifacts:
+            if artifact.get('expired') or not artifact['name'].startswith('cloud-evidence-') or artifact['size_in_bytes']>8_000_000: continue
+            archive=subprocess.run(['gh','api',f'repos/{repo}/actions/artifacts/{artifact["id"]}/zip'],capture_output=True,check=True,timeout=60).stdout
+            with zipfile.ZipFile(io.BytesIO(archive)) as z:
+                def read(name):
+                    matches=[i for i in z.infolist() if Path(i.filename).name==name]
+                    if len(matches)!=1 or matches[0].file_size>8_000_000: raise ValueError('Invalid recovery artifact')
+                    return json.loads(z.read(matches[0]))
+                try: claim=read('claim.json');evidence=read('evidence.json')
+                except (ValueError,KeyError):continue
+            if claim.get('repository')!=repo or str(claim.get('runId'))!=str(run['id']) or not claim.get('execute'):continue
+            body={k:claim[k] for k in ('repository','pr','sha','runId')}
+            # Server requires the original durable reservation and validates hashes.
+            callback('complete',{**body,'evidence':evidence})
+
+
 def reconcile():
     repo=os.environ['GITHUB_REPOSITORY']
     if repo not in REPOS:raise ValueError('Unknown repository')
+    recover_artifacts(repo)
     for run in callback('pending',{'repository':repo})['runs']:
         publish(run,run['evidence'])
 
