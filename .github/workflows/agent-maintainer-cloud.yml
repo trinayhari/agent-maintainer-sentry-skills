@@ -1,0 +1,110 @@
+name: Agent Maintainer cloud evaluations
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: maintainer-cloud-${{ github.event.pull_request.number || github.event_name }}
+  cancel-in-progress: false
+jobs:
+  evaluate:
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft && github.actor == 'trinayhari'
+    runs-on: macos-14
+    timeout-minutes: 25
+    environment: native-evaluation
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+    steps:
+      - name: Checkout trusted default-branch bridge
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - name: Checkout pinned private evaluator
+        if: github.repository == 'trinayhari/agent-maintainer-sentry-skills'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: trinayhari/agent-maintainer
+          ref: 0a7ff87a47817952c2b529af1c45f00eec5b0744
+          ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
+          path: engine
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - run: mkdir -p engine
+      - name: Claim durable cloud budget reservation
+        id: claim
+        working-directory: engine
+        run: python ../control/.github/agent-maintainer-cloud.py claim
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUD_URL: https://web-production-114a2.up.railway.app
+          CLOUD_WORKER_TOKEN: ${{ secrets.CLOUD_WORKER_TOKEN }}
+      - name: Verify native isolation before provider access
+        if: steps.claim.outputs.evaluate == 'true'
+        working-directory: engine
+        run: |
+          python - <<'PYTHON'
+          from trials.native import SandboxFixture
+          fixture = SandboxFixture('code-review')
+          try:
+              if not fixture.invoke_function('discount', [100,20])['complete']: raise SystemExit(2)
+          finally: fixture.close()
+          PYTHON
+      - name: Run paired skill tasks
+        if: steps.claim.outputs.evaluate == 'true'
+        working-directory: engine
+        run: python ../control/.github/agent-maintainer-cloud.py evaluate
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: Persist results and update PR
+        if: always() && steps.claim.outputs.publish == 'true'
+        working-directory: engine
+        run: python ../control/.github/agent-maintainer-cloud.py sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUD_URL: https://web-production-114a2.up.railway.app
+          CLOUD_WORKER_TOKEN: ${{ secrets.CLOUD_WORKER_TOKEN }}
+      - name: Retain recovery evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cloud-evidence-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: |
+            engine/artifacts/cloud-run/claim.json
+            engine/artifacts/cloud-run/evidence.json
+            engine/artifacts/cloud-run/result.json
+            engine/artifacts/cloud-run/ci-result.json
+            engine/artifacts/cloud-run/summary.md
+          if-no-files-found: warn
+          retention-days: 30
+  reconcile:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: native-evaluation
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Retry saved PR publications without model calls
+        run: python .github/agent-maintainer-cloud.py reconcile
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUD_URL: https://web-production-114a2.up.railway.app
+          CLOUD_WORKER_TOKEN: ${{ secrets.CLOUD_WORKER_TOKEN }}
