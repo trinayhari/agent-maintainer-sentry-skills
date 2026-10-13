@@ -1,0 +1,5 @@
+{
+  "purpose": "Exercise automatic code-review skill evaluation on a fresh PR",
+  "skill": "skills/code-review/SKILL.md",
+  "note": "The trusted worker selects the fixed task suite; this file cannot configure tools, graders, models, or secrets."
+}
