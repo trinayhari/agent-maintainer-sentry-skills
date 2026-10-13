@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: trinayhari/agent-maintainer
-          ref: cefc6ca347885a9f73bed1579327b6da512b3c1a
+          ref: 57bed3d1445c94adebcd341f7533e64c08743ca3
           ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
