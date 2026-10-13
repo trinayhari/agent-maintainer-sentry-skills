@@ -35,6 +35,18 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           path: artifacts/repos/pr-source
           persist-credentials: false
+      - name: Verify sandbox before provider access
+        run: |
+          python - <<'PYTHON'
+          import json, sys
+          from trials.native import SandboxFixture
+          fixture = SandboxFixture('code-review')
+          try:
+              result = fixture.invoke_function('discount', [100,20])
+              print(json.dumps({'python':sys.executable,'prefix':sys.base_prefix,'preflight':result}))
+              if not result['complete']: raise SystemExit(2)
+          finally: fixture.close()
+          PYTHON
       - name: Compare no skill and current skill (2 tasks x 3 repetitions)
         run: python -m agent_maintainer.pr_ci
         env:
