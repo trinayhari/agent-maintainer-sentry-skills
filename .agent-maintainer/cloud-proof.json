@@ -1,0 +1,6 @@
+{
+  "purpose": "Verify GitHub-hosted paired skill tasks and automatic cloud evidence synchronization",
+  "taskSuite": "Sentry code-review native challenges",
+  "repetitionsPerArm": 3,
+  "note": "This file is a trigger only. The trusted evaluator controls task definitions, models, tools, and budget."
+}
