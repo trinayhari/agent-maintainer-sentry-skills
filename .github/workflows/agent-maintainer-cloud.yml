@@ -2,12 +2,6 @@ name: Agent Maintainer cloud evaluations
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
-  schedule:
-    - cron: '17,47 * * * *'
-  workflow_run:
-    workflows: ['Agent Maintainer cloud evaluations']
-    types: [completed]
-  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
@@ -89,26 +83,3 @@ jobs:
             engine/artifacts/cloud-run/summary.md
           if-no-files-found: warn
           retention-days: 30
-  reconcile:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request_target')
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: native-evaluation
-    permissions:
-      actions: read
-      contents: read
-      pull-requests: write
-      statuses: write
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with:
-          python-version: '3.11'
-      - name: Retry saved PR publications without model calls
-        run: python .github/agent-maintainer-cloud.py reconcile
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CLOUD_URL: https://web-production-114a2.up.railway.app
-          CLOUD_WORKER_TOKEN: ${{ secrets.CLOUD_WORKER_TOKEN }}

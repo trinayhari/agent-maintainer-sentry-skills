@@ -97,6 +97,7 @@ def publish(body,evidence):
     run_url=f'https://github.com/{repo}/actions/runs/{body["runId"]}'
     current=gh(f'repos/{repo}/pulls/{number}')
     if current['state']!='open' or current['head']['sha']!=sha:
+        callback('published',{**body,'superseded':True})
         print('Evidence saved; stale PR head will not receive a passing status.');return
     marker='<!-- agent-maintainer-cloud:'+sha+' -->'
     text=marker+'\n'+evidence['summary'];page=1;existing=None
@@ -119,7 +120,7 @@ def recover_artifacts(repo):
     runs=gh(f'repos/{repo}/actions/workflows/agent-maintainer-cloud.yml/runs?event=pull_request_target&per_page=30')['workflow_runs']
     for run in runs:
         if run['status']!='completed' or run.get('conclusion')=='success': continue
-        artifacts=gh(f'repos/{repo}/actions/runs/{run['id']}/artifacts')['artifacts']
+        artifacts=gh(f'repos/{repo}/actions/runs/{run["id"]}/artifacts')['artifacts']
         for artifact in artifacts:
             if artifact.get('expired') or not artifact['name'].startswith('cloud-evidence-') or artifact['size_in_bytes']>8_000_000: continue
             archive=subprocess.run(['gh','api',f'repos/{repo}/actions/artifacts/{artifact["id"]}/zip'],capture_output=True,check=True,timeout=60).stdout
