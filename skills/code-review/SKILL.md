@@ -36,6 +36,8 @@ Every PR should have appropriate test coverage:
 
 Verify tests cover actual requirements and edge cases. Avoid excessive branching or looping in test code.
 
+Before concluding a review, identify at least one documented edge case not exercised by the public tests and probe it with the available tools. Report the input, observed result, and the contract it checks. Passing smoke tests alone do not establish correctness. If a probe cannot run, state that limitation rather than claiming verification.
+
 ### Long-Term Impact
 
 Flag for senior engineer review when changes involve:
