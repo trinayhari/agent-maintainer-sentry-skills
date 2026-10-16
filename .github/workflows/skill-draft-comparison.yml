@@ -18,11 +18,49 @@ jobs:
       pull-requests: write
       statuses: write
     steps:
+      - name: Show evaluation in progress in the PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python - <<'PYTHON'
+          import json, os, subprocess
+          def api(path, body=None, method=None):
+              args=['gh','api',path]
+              if method: args+=['--method',method]
+              if body is not None: args+=['--input','-']
+              p=subprocess.run(args,input=json.dumps(body) if body is not None else None,text=True,capture_output=True,check=True)
+              return json.loads(p.stdout)
+          repo=os.environ['GH_REPO']; number=os.environ['PR_NUMBER']
+          pr=api(f'repos/{repo}/pulls/{number}')
+          if pr['state']!='open' or pr['head']['sha']!=os.environ['EXPECTED_HEAD'] or pr['base']['sha']!=os.environ['EXPECTED_BASE']:
+              raise SystemExit('PR changed; refusing stale publication')
+          marker='<!-- current-draft-comparison -->'
+          url=f"https://github.com/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          head=os.environ['EXPECTED_HEAD']; base=os.environ['EXPECTED_BASE']
+          body=marker+'\n# Evaluating latest draft\n\nCurrent skill `'+base[:8]+'` → draft `'+head[:8]+'`.\n\nEach task runs three times with each skill version. This comment will update when the run finishes. **No result for this draft yet.**\n\n[View run progress]('+url+')\n'
+          comments=[]; page=1
+          while True:
+              batch=api(f'repos/{repo}/issues/{number}/comments?per_page=100&page={page}')
+              comments.extend(batch)
+              if len(batch)<100: break
+              page+=1
+          existing=[c for c in comments if c['user']['login']=='github-actions[bot]' and
+                    (c['body'].startswith(marker) or c['body'].startswith('<!-- current-draft-comparison:'))]
+          if existing:
+              api(f"repos/{repo}/issues/comments/{existing[-1]['id']}",{'body':body},method='PATCH')
+          else:
+              api(f'repos/{repo}/issues/{number}/comments',{'body':body},method='POST')
+          api(f'repos/{repo}/statuses/{head}',{'state':'pending','context':'hukum / current vs draft','description':'Evaluating latest draft against current skill','target_url':url},method='POST')
+          PYTHON
       - name: Checkout trusted pinned evaluator
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: trinayhari/agent-maintainer
-          ref: 4675b79581729c439867aa438d1a59cc091047ef
+          ref: c94272a13ab70d5941aa05438dceb330910ac158
           ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
           path: engine
           persist-credentials: false
