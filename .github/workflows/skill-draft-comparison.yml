@@ -1,0 +1,146 @@
+name: Current skill vs new draft
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+concurrency:
+  group: skill-draft-comparison-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+jobs:
+  compare:
+    if: github.repository == 'trinayhari/agent-maintainer-sentry-skills' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'codex/review-edge-case-probe' && github.actor == 'trinayhari'
+    runs-on: macos-14
+    timeout-minutes: 25
+    environment: native-evaluation
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+    steps:
+      - name: Show evaluation in progress in the PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python - <<'PYTHON'
+          import json, os, subprocess
+          def api(path, body=None, method=None):
+              args=['gh','api',path]
+              if method: args+=['--method',method]
+              if body is not None: args+=['--input','-']
+              p=subprocess.run(args,input=json.dumps(body) if body is not None else None,text=True,capture_output=True,check=True)
+              return json.loads(p.stdout)
+          repo=os.environ['GH_REPO']; number=os.environ['PR_NUMBER']
+          pr=api(f'repos/{repo}/pulls/{number}')
+          if pr['state']!='open' or pr['head']['sha']!=os.environ['EXPECTED_HEAD'] or pr['base']['sha']!=os.environ['EXPECTED_BASE']:
+              raise SystemExit('PR changed; refusing stale publication')
+          marker='<!-- current-draft-comparison -->'
+          url=f"https://github.com/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          head=os.environ['EXPECTED_HEAD']; base=os.environ['EXPECTED_BASE']
+          body=marker+'\n# Evaluating latest draft\n\nCurrent skill `'+base[:8]+'` → draft `'+head[:8]+'`.\n\nEach task runs three times with each skill version. This comment will update when the run finishes. **No result for this draft yet.**\n\n[View run progress]('+url+')\n'
+          comments=[]; page=1
+          while True:
+              batch=api(f'repos/{repo}/issues/{number}/comments?per_page=100&page={page}')
+              comments.extend(batch)
+              if len(batch)<100: break
+              page+=1
+          existing=[c for c in comments if c['user']['login']=='github-actions[bot]' and
+                    (c['body'].startswith(marker) or c['body'].startswith('<!-- current-draft-comparison:'))]
+          if existing:
+              api(f"repos/{repo}/issues/comments/{existing[-1]['id']}",{'body':body},method='PATCH')
+          else:
+              api(f'repos/{repo}/issues/{number}/comments',{'body':body},method='POST')
+          api(f'repos/{repo}/statuses/{head}',{'state':'pending','context':'hukum / current vs draft','description':'Evaluating latest draft against current skill','target_url':url},method='POST')
+          PYTHON
+      - name: Checkout trusted pinned evaluator
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: trinayhari/agent-maintainer
+          ref: c94272a13ab70d5941aa05438dceb330910ac158
+          ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
+          path: engine
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11'
+      - name: Checkout current skill at exact PR base
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: current-source
+          persist-credentials: false
+      - name: Checkout draft skill at exact PR head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: draft-source
+          persist-credentials: false
+      - name: Compare current and draft (2 tasks, 3 runs each)
+        working-directory: engine
+        run: python -m agent_maintainer.pr_comparison --base ../current-source --head ../draft-source --event "$GITHUB_EVENT_PATH"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: Publish run-by-run results
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          def api(path, body=None, method=None):
+              args=['gh','api',path]
+              if method: args+=['--method',method]
+              if body is not None: args+=['--input','-']
+              p=subprocess.run(args,input=json.dumps(body) if body else None,text=True,capture_output=True,check=True)
+              return json.loads(p.stdout)
+          repo=os.environ['GH_REPO']; number=os.environ['PR_NUMBER']
+          pr=api(f'repos/{repo}/pulls/{number}')
+          if pr['state']!='open' or pr['head']['sha']!=os.environ['EXPECTED_HEAD'] or pr['base']['sha']!=os.environ['EXPECTED_BASE']:
+              raise SystemExit('PR changed; refusing stale publication')
+          out=Path('engine/artifacts/pr-comparison')
+          result=json.loads((out/'result.json').read_text()) if (out/'result.json').is_file() else {}
+          binding=result.get('provenance',{}).get('comparison',{})
+          status=result.get('status','INCOMPLETE')
+          if result and (binding.get('baseCommit')!=os.environ['EXPECTED_BASE'] or binding.get('headCommit')!=os.environ['EXPECTED_HEAD']):
+              raise SystemExit('Evidence binding mismatch')
+          summary=(out/'summary.md').read_text() if (out/'summary.md').is_file() else '# Skill change evaluation — INCOMPLETE\n\nNo evaluation evidence was produced. Check Actions logs.'
+          url=f"https://github.com/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          marker='<!-- current-draft-comparison -->'
+          body=marker+'\n'+summary+'\n[GitHub Actions run and JSON evidence]('+url+')\n'
+          # Reuse one comment per PR, including older commit-specific markers.
+          comments=[]
+          page=1
+          while True:
+              batch=api(f'repos/{repo}/issues/{number}/comments?per_page=100&page={page}')
+              comments.extend(batch)
+              if len(batch)<100: break
+              page+=1
+          existing=[c for c in comments if c['user']['login']=='github-actions[bot]' and
+                    (c['body'].startswith(marker) or c['body'].startswith('<!-- current-draft-comparison:'))]
+          if existing:
+              keep=existing[-1]
+              api(f"repos/{repo}/issues/comments/{keep['id']}",{'body':body[:60000]},method='PATCH')
+          else:
+              api(f'repos/{repo}/issues/{number}/comments',{'body':body[:60000]},method='POST')
+          api(f"repos/{repo}/statuses/{os.environ['EXPECTED_HEAD']}",{'state':'success' if status=='PASS' else 'failure','context':'hukum / current vs draft','description':status+' — current skill vs new draft; screening only','target_url':url},method='POST')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f: f.write(summary)
+          PY
+      - name: Save evaluation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: current-draft-${{ github.event.pull_request.head.sha }}
+          path: |
+            engine/artifacts/pr-comparison/result.json
+            engine/artifacts/pr-comparison/summary.md
+          if-no-files-found: warn
+          retention-days: 14
