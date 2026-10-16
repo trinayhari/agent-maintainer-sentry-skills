@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: trinayhari/agent-maintainer
-          ref: 87f02eb863ad99134253efa7a7655704660f5428
+          ref: 4675b79581729c439867aa438d1a59cc091047ef
           ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
           path: engine
           persist-credentials: false
@@ -58,9 +58,10 @@ jobs:
           python - <<'PY'
           import json, os, subprocess
           from pathlib import Path
-          def api(path, body=None):
+          def api(path, body=None, method=None):
               args=['gh','api',path]
-              if body is not None: args+=['--method','POST','--input','-']
+              if method: args+=['--method',method]
+              if body is not None: args+=['--input','-']
               p=subprocess.run(args,input=json.dumps(body) if body else None,text=True,capture_output=True,check=True)
               return json.loads(p.stdout)
           repo=os.environ['GH_REPO']; number=os.environ['PR_NUMBER']
@@ -75,10 +76,24 @@ jobs:
               raise SystemExit('Evidence binding mismatch')
           summary=(out/'summary.md').read_text() if (out/'summary.md').is_file() else '# Skill change evaluation — INCOMPLETE\n\nNo evaluation evidence was produced. Check Actions logs.'
           url=f"https://github.com/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
-          marker='<!-- current-draft-comparison:'+os.environ['EXPECTED_HEAD']+' -->'
+          marker='<!-- current-draft-comparison -->'
           body=marker+'\n'+summary+'\n[GitHub Actions run and JSON evidence]('+url+')\n'
-          api(f'repos/{repo}/issues/{number}/comments',{'body':body[:60000]})
-          api(f"repos/{repo}/statuses/{os.environ['EXPECTED_HEAD']}",{'state':'success' if status=='PASS' else 'failure','context':'hukum / current vs draft','description':status+' — current skill vs new draft; screening only','target_url':url})
+          # Reuse one comment per PR, including older commit-specific markers.
+          comments=[]
+          page=1
+          while True:
+              batch=api(f'repos/{repo}/issues/{number}/comments?per_page=100&page={page}')
+              comments.extend(batch)
+              if len(batch)<100: break
+              page+=1
+          existing=[c for c in comments if c['user']['login']=='github-actions[bot]' and
+                    (c['body'].startswith(marker) or c['body'].startswith('<!-- current-draft-comparison:'))]
+          if existing:
+              keep=existing[-1]
+              api(f"repos/{repo}/issues/comments/{keep['id']}",{'body':body[:60000]},method='PATCH')
+          else:
+              api(f'repos/{repo}/issues/{number}/comments',{'body':body[:60000]},method='POST')
+          api(f"repos/{repo}/statuses/{os.environ['EXPECTED_HEAD']}",{'state':'success' if status=='PASS' else 'failure','context':'hukum / current vs draft','description':status+' — current skill vs new draft; screening only','target_url':url},method='POST')
           with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f: f.write(summary)
           PY
       - name: Save evaluation evidence
