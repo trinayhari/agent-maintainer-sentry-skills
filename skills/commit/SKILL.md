@@ -7,6 +7,11 @@ description: Use for every request to commit changes or draft a commit message. 
 
 ## Before Committing
 
+For a draft-only request, use the supplied change facts and return the requested
+message format without running Git commands or claiming a commit was created.
+Apply the same message and footer rules to drafts. For an actual commit, first
+check the branch:
+
 ```bash
 git branch --show-current
 ```
@@ -47,7 +52,8 @@ without logic changes, and `meta` for repository metadata.
 ## Footers
 
 - `Fixes <issue>` closes an issue when merged.
-- `Refs <issue>` links an issue without closing it.
+- `Refs <issue>` links an issue without closing it. When the request says to
+  reference an issue without closing it, preserve that distinction.
 - For breaking changes, add `BREAKING CHANGE: <impact>`.
 
 ## Creating the Commit

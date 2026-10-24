@@ -9,6 +9,10 @@ argument-hint: '[optional description of the work]'
 Create a git branch following Sentry naming conventions.
 Keep this workflow non-interactive unless the user explicitly asks to choose the name manually.
 
+For a plan-only request, resolve the base and collision-free name from the
+supplied repository facts, return the requested plan, and do not execute
+commands or claim the branch exists. Otherwise perform the workflow below.
+
 ## Workflow
 
 1. Resolve the work description:
@@ -56,6 +60,8 @@ Keep this workflow non-interactive unless the user explicitly asks to choose the
    - Only switch to the default branch when the user explicitly asks
 
 5. Avoid collisions by appending `-2`, `-3`, and so on until the name is unused locally and remotely.
+   Check each candidate against the union of local and remote branch names; a
+   name that is free in only one location still collides.
 
 6. Create the branch:
    ```bash
