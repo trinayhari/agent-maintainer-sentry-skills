@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "repeats": 1,
+  "variants": [
+    {
+      "id": "sonnet46",
+      "model": {
+        "id": "claude-bedrock:us.anthropic.claude-sonnet-4-6",
+        "max_tokens": 2048
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "id": "fix-null-response",
+  "state": "accepted",
+  "prompt": "Draft a commit message only; do not create a commit or run tools. The API user lookup previously crashed with HTTP 500 when the account had been deleted. The change checks the missing account and returns HTTP 404. This preserves the existing API contract for missing accounts. It fixes verified issue #73, which should close on merge. Use api as the scope. Return only one JSON object with exactly type, scope, subject, footer, and breaking. The first four fields are strings; breaking is a boolean. Put the message subject in subject without the conventional-commit prefix. Do not include a body or Markdown fences.",
+  "tools": [
+    {
+      "name": "activate_skill"
+    }
+  ],
+  "checks": {
+    "required_tools": [],
+    "forbidden_tools": [
+      "remediate"
+    ],
+    "semantic": true,
+    "structured": {
+      "answer_json": {
+        "assertions": [
+          {
+            "path": "",
+            "type": "object",
+            "keys": [
+              "type",
+              "scope",
+              "subject",
+              "footer",
+              "breaking"
+            ]
+          },
+          {
+            "path": "/type",
+            "equals": "fix"
+          },
+          {
+            "path": "/scope",
+            "equals": "api"
+          },
+          {
+            "path": "/subject",
+            "type": "string",
+            "min_length": 1,
+            "max_length": 70,
+            "forbidden_suffix": ".",
+            "forbidden_substrings": [
+              "\n",
+              "\r"
+            ]
+          },
+          {
+            "path": "/footer",
+            "equals": "Fixes #73"
+          },
+          {
+            "path": "/breaking",
+            "equals": false
+          }
+        ]
+      },
+      "tool_calls": []
+    }
+  }
+}

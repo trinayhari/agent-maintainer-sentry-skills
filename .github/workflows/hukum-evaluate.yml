@@ -1,6 +1,6 @@
 # Generated review-only adapter. No repository variables or secrets are created.
-# Trusted evaluator: trinayhari/agent-maintainer@f248bc934b83cce17d462928d24f96a3cb5aeeb8
-# Canonical workflow SHA-256: 08dfc65ba2818741029cc7cb1927940fcb52e4fab89d575cf55b10344616f453
+# Trusted evaluator: trinayhari/agent-maintainer@1765da292ff47a8eb4ec981da5b9fb49e5a3e94a
+# Canonical workflow SHA-256: 0152cdb4ad99acd49b6ced7cd51ee856fe31c3f0373c9e71e4c4d526d43d1acd
 # Regenerate from a reviewed evaluator commit; do not float this pin.
 name: Live skill PR comparison
 
@@ -98,7 +98,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: trinayhari/agent-maintainer
-          ref: f248bc934b83cce17d462928d24f96a3cb5aeeb8
+          ref: 1765da292ff47a8eb4ec981da5b9fb49e5a3e94a
           ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
           path: evaluator
           persist-credentials: false
@@ -120,9 +120,26 @@ jobs:
       - name: Install only trusted evaluator dependencies
         working-directory: evaluator
         run: |
+          python -m pip install -e .
+          npm ci --ignore-scripts --no-audit --no-fund
+      - name: Inspect selected task requirements
+        id: task-requirements
+        working-directory: evaluator
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          REVISION_SHA: ${{ github.event.pull_request.head.sha }}
+          COMPARISON: skill-change
+        run: |
+          python scripts/evaluation-requirements.py --repo "$GITHUB_WORKSPACE/capability" \
+            --base "$BASE_SHA" --revision "$REVISION_SHA" --comparison "$COMPARISON" \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Install browser only for selected HTML checks
+        if: steps.task-requirements.outputs.needs_html == 'true'
+        working-directory: evaluator
+        timeout-minutes: 5
+        run: |
           python -m pip install -e ".[html]"
           python -m playwright install --with-deps chromium
-          npm ci --ignore-scripts --no-audit --no-fund
       - name: Load opt-in trusted policy
         working-directory: evaluator
         env:
@@ -230,7 +247,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           repository: trinayhari/agent-maintainer
-          ref: f248bc934b83cce17d462928d24f96a3cb5aeeb8
+          ref: 1765da292ff47a8eb4ec981da5b9fb49e5a3e94a
           ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
