@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   evaluate:
-    if: github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft && github.actor == 'trinayhari'
+    if: vars.HUKUM_ENABLE_LEGACY_PILOT == 'true' && github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft && github.actor == 'trinayhari'
     runs-on: macos-14
     timeout-minutes: 25
     environment: native-evaluation

@@ -1,0 +1,264 @@
+# Generated review-only adapter. No repository variables or secrets are created.
+# Trusted evaluator: trinayhari/agent-maintainer@f248bc934b83cce17d462928d24f96a3cb5aeeb8
+# Canonical workflow SHA-256: 08dfc65ba2818741029cc7cb1927940fcb52e4fab89d575cf55b10344616f453
+# Regenerate from a reviewed evaluator commit; do not float this pin.
+name: Live skill PR comparison
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft, closed, edited]
+    branches: [main]
+    # Keep the trusted main base boundary. Do not filter paths: reverting a
+    # skill change must still cancel the preceding run before scope selection.
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hukum-live-pr-${{ github.repository }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  eligibility:
+    name: Validate opt-in live PR scope
+    if: vars.HUKUM_ENABLE_LIVE_PR == 'true' && github.repository == 'trinayhari/agent-maintainer-sentry-skills'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      evaluate: ${{ steps.changes.outputs.evaluate }}
+    steps:
+      - name: Reject unsupported or stale PR before privileged work
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          REVISION_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > pr.json
+          python - <<'PY'
+          import json, os, re
+          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
+          pr = json.load(open('pr.json'))
+          repository = os.environ['GITHUB_REPOSITORY']
+          for name in ('BASE_SHA', 'REVISION_SHA'):
+              if not re.fullmatch('[a-f0-9]{40}', os.environ[name]):
+                  raise SystemExit('Immutable PR revisions required')
+          if (event.get('pull_request', {}).get('head', {}).get('repo', {}).get('full_name') != repository
+                  or pr.get('state') != 'open' or pr.get('draft') is not False
+                  or pr.get('number') != int(os.environ['PR_NUMBER'])
+                  or pr.get('head', {}).get('repo', {}).get('full_name') != repository
+                  or pr.get('base', {}).get('repo', {}).get('full_name') != repository
+                  or pr.get('base', {}).get('ref') != 'main'
+                  or pr.get('head', {}).get('sha') != os.environ['REVISION_SHA']
+                  or pr.get('base', {}).get('sha') != os.environ['BASE_SHA']
+                  or os.environ['GITHUB_SHA'] != os.environ['BASE_SHA']):
+              raise SystemExit('Live PR evaluation requires an open non-draft same-repository PR against the current reviewed main; fork execution is disabled')
+          PY
+
+      - name: Select changed skill or evaluation paths
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files?per_page=100" > files.json
+          python - <<'PYCODE'
+          import json, os
+          pr = json.load(open('pr.json'))
+          pages = json.load(open('files.json'))
+          files = [item for page in pages for item in page]
+          if (type(pr.get('changed_files')) is not int or pr['changed_files'] > 3000
+                  or len(files) != pr['changed_files']):
+              raise SystemExit('Incomplete changed-file listing; refusing evaluation scope guess')
+          selected = any(isinstance(path, str) and path.startswith(('skills/', 'evals/'))
+                         for item in files for path in (item.get('filename'), item.get('previous_filename')))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('evaluate=' + str(selected).lower() + '\n')
+          if not selected:
+              print('No skill or evaluation paths changed; live evaluation skipped (not a passing evaluation).')
+          PYCODE
+
+  evaluate:
+    needs: eligibility
+    if: needs.eligibility.outputs.evaluate == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    environment: aws-evaluation
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+    outputs:
+      artifact_url: ${{ steps.evidence.outputs.artifact-url }}
+    steps:
+      - name: Checkout trusted main evaluator only
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: trinayhari/agent-maintainer
+          ref: f248bc934b83cce17d462928d24f96a3cb5aeeb8
+          ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
+          path: evaluator
+          persist-credentials: false
+      - name: Checkout exact capability data without executing PR code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: capability
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+          lfs: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.22.0'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Install only trusted evaluator dependencies
+        working-directory: evaluator
+        run: |
+          python -m pip install -e ".[html]"
+          python -m playwright install --with-deps chromium
+          npm ci --ignore-scripts --no-audit --no-fund
+      - name: Load opt-in trusted policy
+        working-directory: evaluator
+        env:
+          SETTINGS_JSON: ${{ vars.HUKUM_AWS_SETTINGS_JSON }}
+          APPROVAL_JSON: ${{ vars.HUKUM_APPROVAL_JSON }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          directory = Path('.agent-maintainer/aws')
+          directory.mkdir(parents=True, exist_ok=True)
+          policy = json.loads(os.environ['APPROVAL_JSON'])
+          if type(policy.get('version')) is not int or policy['version'] != 2:
+              raise SystemExit('Automatic skill updates require an explicitly reviewed version-two policy')
+          (directory/'approval.json').write_text(json.dumps(policy))
+          (directory/'settings.json').write_text(json.dumps(json.loads(os.environ['SETTINGS_JSON'])))
+          PY
+      - name: Recheck snapshot and accepted contracts before AWS credentials
+        working-directory: evaluator
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          REVISION_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > pr.json
+          python - <<'PY'
+          import json, os
+          from agent_maintainer.pipeline.selection import select
+          from agent_maintainer.pipeline.comparison import build_matrix, validate_paired_criteria
+          from agent_maintainer.pipeline.aws import approved_contracts, load_settings
+          pr = json.load(open('pr.json'))
+          repository = os.environ['GITHUB_REPOSITORY']
+          if (pr.get('state') != 'open' or pr.get('draft') is not False
+                  or pr.get('head', {}).get('sha') != os.environ['REVISION_SHA']
+                  or pr.get('base', {}).get('sha') != os.environ['BASE_SHA']
+                  or pr.get('head', {}).get('repo', {}).get('full_name') != repository
+                  or pr.get('base', {}).get('repo', {}).get('full_name') != repository
+                  or pr.get('number') != int(os.environ['PR_NUMBER'])
+                  or pr.get('base', {}).get('ref') != 'main'):
+              raise SystemExit('PR changed while awaiting trusted environment approval')
+          root = os.path.join(os.environ['GITHUB_WORKSPACE'], 'capability')
+          suites, _ = select(root, os.environ['REVISION_SHA'], os.environ['BASE_SHA'])
+          matrix = build_matrix(suites, root, os.environ['BASE_SHA'], os.environ['REVISION_SHA'], 'skill-change', 10)
+          policy = approved_contracts('.agent-maintainer/aws/approval.json', repository, matrix, load_settings('.agent-maintainer/aws/settings.json'))
+          validate_paired_criteria(matrix, policy)
+          PY
+      - name: Assume evaluator role
+        uses: aws-actions/configure-aws-credentials@ff717079ee2060e4bcee96c4779b553acc87447c # v4
+        with:
+          role-to-assume: ${{ vars.HUKUM_EVALUATOR_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+          role-session-name: hukum-pr-${{ github.run_id }}
+      - name: Evaluate both skill snapshots
+        working-directory: evaluator
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          REVISION_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          ./run-eval.sh --backend aws-lambda --repo "$GITHUB_WORKSPACE/capability" \
+            --repository "$GITHUB_REPOSITORY" --base "$BASE_SHA" --revision "$REVISION_SHA" \
+            --comparison skill-change --aws-settings .agent-maintainer/aws/settings.json \
+            --approval-file .agent-maintainer/aws/approval.json --max-invocations 10 --max-tokens 20000 \
+            --output "$GITHUB_WORKSPACE/evidence"
+      - name: Publish immutable private report
+        if: ${{ !cancelled() }}
+        working-directory: evaluator
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from agent_maintainer.pipeline.aws import load_settings, publish
+          from agent_maintainer.pipeline.provenance import validate_evidence
+          reports = list((Path(os.environ['GITHUB_WORKSPACE'])/'evidence').glob('*/report.json'))
+          if len(reports) != 1:
+              raise SystemExit('No unique completed report; inspect workflow failure')
+          validate_evidence(reports[0].parent, os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_RUN_ID'], os.environ['GITHUB_RUN_ATTEMPT'])
+          print(json.dumps(publish(reports[0].parent, load_settings('.agent-maintainer/aws/settings.json')), indent=2))
+          PY
+      - name: Write job summary
+        if: always()
+        working-directory: evaluator
+        run: python scripts/github-summary.py "$GITHUB_WORKSPACE/evidence"
+      - name: Retain immutable evidence
+        id: evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: hukum-live-pr-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-comment:
+    needs: evaluate
+    if: ${{ !cancelled() && needs.evaluate.outputs.artifact_url != '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    steps:
+      - name: Checkout trusted main publisher
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: trinayhari/agent-maintainer
+          ref: f248bc934b83cce17d462928d24f96a3cb5aeeb8
+          ssh-key: ${{ secrets.MAINTAINER_READ_KEY }}
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Install trusted publication dependencies
+        run: python -m pip install -e .
+      - name: Download exact immutable artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" \
+            --name "hukum-live-pr-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" --dir evidence
+      - name: Validate evidence and publish current PR comparison
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ARTIFACT_URL: ${{ needs.evaluate.outputs.artifact_url }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from agent_maintainer.pipeline.provenance import validate_evidence
+          reports = list(Path('evidence').glob('*/report.json'))
+          if len(reports) != 1:
+              raise SystemExit('Expected one report')
+          validate_evidence(reports[0].parent, os.environ['GITHUB_REPOSITORY'], os.environ['GITHUB_RUN_ID'], os.environ['GITHUB_RUN_ATTEMPT'])
+          PY
+          python -m agent_maintainer.pipeline.github_comment evidence \
+            --repository "$GITHUB_REPOSITORY" --pull-request "$PR_NUMBER" \
+            --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT" --artifact-url "$ARTIFACT_URL"
