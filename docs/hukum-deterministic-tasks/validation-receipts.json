@@ -1,0 +1,927 @@
+{
+  "fix-null-response": {
+    "version": 1,
+    "kind": "structured",
+    "passed": true,
+    "contract_digest": "4ba0dd617754b37c98e08d7278161279a56184269ad0d54499f9812e4ad3b546",
+    "controls_digest": "8ec5b3948693f57eec84d7c92466093233c65f51df910a3fb8f27db8c8cc2631",
+    "grader_sha256": "6d1db19f73453a48afd224242e9dc23462939fcb5db242ecd37bbca12c48e6ef",
+    "required_requirements": [
+      "answer_json:parse",
+      "answer_json:0:keys",
+      "answer_json:0:type",
+      "answer_json:1:equals",
+      "answer_json:2:equals",
+      "answer_json:3:forbidden_substrings",
+      "answer_json:3:forbidden_suffix",
+      "answer_json:3:max_length",
+      "answer_json:3:min_length",
+      "answer_json:3:type",
+      "answer_json:4:equals",
+      "answer_json:5:equals",
+      "tool_calls:count"
+    ],
+    "covered_requirements": [
+      "answer_json:0:keys",
+      "answer_json:0:type",
+      "answer_json:1:equals",
+      "answer_json:2:equals",
+      "answer_json:3:forbidden_substrings",
+      "answer_json:3:forbidden_suffix",
+      "answer_json:3:max_length",
+      "answer_json:3:min_length",
+      "answer_json:3:type",
+      "answer_json:4:equals",
+      "answer_json:5:equals",
+      "answer_json:parse",
+      "tool_calls:count"
+    ],
+    "missing_requirements": [],
+    "cases": [
+      {
+        "id": "known-good",
+        "kind": "known-good",
+        "response_digest": "a59044315b6e94fcf2d760671f9ac82a8e20c6bf0bd8b7d901da91b7d0736d05",
+        "expected": "PASS",
+        "status": "PASS",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": []
+      },
+      {
+        "id": "allowed-alternative",
+        "kind": "allowed-alternative",
+        "response_digest": "94d96f0a76361c94ec029306fe4597504d0e707dbbab1c9866ef748f68b91788",
+        "expected": "PASS",
+        "status": "PASS",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": []
+      },
+      {
+        "id": "invalid-json",
+        "kind": "negative",
+        "response_digest": "caaeca30e582a62842e044d532b9ca4babfa74ca1ed29b3c1c8e9bdccb97976a",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:parse"
+        ],
+        "observed_violations": [
+          "answer_json:parse"
+        ],
+        "failures": [
+          "JSON output format: expected \"one strict JSON value without duplicate keys or surrounding prose\"; observed \"invalid JSON\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-0-keys",
+        "kind": "negative",
+        "response_digest": "d8ccb1a49ec2dd516254f6f5326d083e0005cf1737f717f67327836bf01ee0e1",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:0:keys"
+        ],
+        "observed_violations": [
+          "answer_json:0:keys"
+        ],
+        "failures": [
+          "JSON field / keys: expected {\"keys\": [\"type\", \"scope\", \"subject\", \"footer\", \"breaking\"]}; observed {\"breaking\": false, \"footer\": \"Fixes #73\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"type\": \"fix\", \"unexpected\": \"not requested\"}"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-0-type",
+        "kind": "negative",
+        "response_digest": "757d320e1efad4a62fdf55640aa69b0c00745deeb55b0475a4959df47a04ac20",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:0:type"
+        ],
+        "observed_violations": [
+          "answer_json:0:keys",
+          "answer_json:0:type",
+          "answer_json:1:equals",
+          "answer_json:2:equals",
+          "answer_json:3:forbidden_substrings",
+          "answer_json:3:forbidden_suffix",
+          "answer_json:3:max_length",
+          "answer_json:3:min_length",
+          "answer_json:3:type",
+          "answer_json:4:equals",
+          "answer_json:5:equals"
+        ],
+        "failures": [
+          "JSON field / keys: expected {\"keys\": [\"type\", \"scope\", \"subject\", \"footer\", \"breaking\"]}; observed []",
+          "JSON field / type: expected {\"type\": \"object\"}; observed []",
+          "JSON field /type equals: expected {\"equals\": \"fix\"}; observed {\"missing_path\": \"/type\"}",
+          "JSON field /scope equals: expected {\"equals\": \"api\"}; observed {\"missing_path\": \"/scope\"}",
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject forbidden_suffix: expected {\"forbidden_suffix\": \".\"}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject max_length: expected {\"max_length\": 70}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject min_length: expected {\"min_length\": 1}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject type: expected {\"type\": \"string\"}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /footer equals: expected {\"equals\": \"Fixes #73\"}; observed {\"missing_path\": \"/footer\"}",
+          "JSON field /breaking equals: expected {\"equals\": false}; observed {\"missing_path\": \"/breaking\"}"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-1-equals",
+        "kind": "negative",
+        "response_digest": "12c9a1bc23359abbb53a2d7f74001033915060a6b08fd18743cce82fbe347a0a",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:1:equals"
+        ],
+        "observed_violations": [
+          "answer_json:1:equals"
+        ],
+        "failures": [
+          "JSON field /type equals: expected {\"equals\": \"fix\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-2-equals",
+        "kind": "negative",
+        "response_digest": "53c48e19e26eb703d2cb4fa48e2a1064f6b1f07e8c819add313eca1b27d9d2f7",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:2:equals"
+        ],
+        "observed_violations": [
+          "answer_json:2:equals"
+        ],
+        "failures": [
+          "JSON field /scope equals: expected {\"equals\": \"api\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-forbidden-substrings",
+        "kind": "negative",
+        "response_digest": "b540b1a171edc7fab34376597bd9e538a53f902534507fb85253b23447a16d5c",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed \"Return 404 for deleted account lookups\\nExtra line\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "subject-carriage-return",
+        "kind": "negative",
+        "response_digest": "98eb630d614579b5922ac63b46ff18347aaba9c1440e943c14604e66d18d8317",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed \"Return 404 for deleted account lookups\\rExtra line\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-forbidden-suffix",
+        "kind": "negative",
+        "response_digest": "9a10d4d770ad0ef2e30aa444256a04047b71116b0a064e6b69030debc640c2d3",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:forbidden_suffix"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_suffix"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_suffix: expected {\"forbidden_suffix\": \".\"}; observed \"Return 404 for deleted account lookups.\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-max-length",
+        "kind": "negative",
+        "response_digest": "eb4c7709efa3c33a29f415f6fc222d6fee43f20408186192caff7bc5453661bc",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:max_length"
+        ],
+        "observed_violations": [
+          "answer_json:3:max_length"
+        ],
+        "failures": [
+          "JSON field /subject max_length: expected {\"max_length\": 70}; observed \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-min-length",
+        "kind": "negative",
+        "response_digest": "b2c44fe0c84df16bbb6e4e70386cd656b373c4c586172a3175012158bcd09b2c",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:min_length"
+        ],
+        "observed_violations": [
+          "answer_json:3:min_length"
+        ],
+        "failures": [
+          "JSON field /subject min_length: expected {\"min_length\": 1}; observed \"\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-type",
+        "kind": "negative",
+        "response_digest": "bded5c6c9fbb1a59c274cd8e12bf7fef093b6b6bb17030b17ff40bdf809bfc47",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:type"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_substrings",
+          "answer_json:3:forbidden_suffix",
+          "answer_json:3:max_length",
+          "answer_json:3:min_length",
+          "answer_json:3:type"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed 17",
+          "JSON field /subject forbidden_suffix: expected {\"forbidden_suffix\": \".\"}; observed 17",
+          "JSON field /subject max_length: expected {\"max_length\": 70}; observed 17",
+          "JSON field /subject min_length: expected {\"min_length\": 1}; observed 17",
+          "JSON field /subject type: expected {\"type\": \"string\"}; observed 17"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-4-equals",
+        "kind": "negative",
+        "response_digest": "65c3669d577e0a9c3df64dadcf4a42cecf411368c4ea243d432b9664278b911e",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:4:equals"
+        ],
+        "observed_violations": [
+          "answer_json:4:equals"
+        ],
+        "failures": [
+          "JSON field /footer equals: expected {\"equals\": \"Fixes #73\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-5-equals",
+        "kind": "negative",
+        "response_digest": "20c7e7b2513c91c80e35b63de13d894302040a61790b4f8083a01a8da935bc87",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:5:equals"
+        ],
+        "observed_violations": [
+          "answer_json:5:equals"
+        ],
+        "failures": [
+          "JSON field /breaking equals: expected {\"equals\": false}; observed true"
+        ],
+        "errors": []
+      },
+      {
+        "id": "unexpected-tool-call",
+        "kind": "negative",
+        "response_digest": "bd462d45e62c86a085e13e8e9fc593a9cb7884ec4dc47e3eb91f175ca007c756",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "tool_calls:count"
+        ],
+        "observed_violations": [
+          "tool_calls:count"
+        ],
+        "failures": [
+          "Tool call count: expected 0; observed 1"
+        ],
+        "errors": []
+      },
+      {
+        "id": "incomplete",
+        "kind": "incomplete",
+        "response_digest": "6bac3df8207582d3a3c4a2a8d321ba872dde61fd0a5e569958ef4b8327f9f7e3",
+        "expected": "FAULT",
+        "status": "FAULT",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": [
+          "Runtime did not complete"
+        ]
+      }
+    ],
+    "model_calls": 0,
+    "semantic_validation": false
+  },
+  "refactor-link": {
+    "version": 1,
+    "kind": "structured",
+    "passed": true,
+    "contract_digest": "0bdf6c34125122c0cdb09963eb5e4eec538f156abc9ece593bc4f1e779b6e7dd",
+    "controls_digest": "332d2572bcdb3a9ec8a73cba2f98884e37977e05d0e7170fced84a88157ae1e6",
+    "grader_sha256": "6d1db19f73453a48afd224242e9dc23462939fcb5db242ecd37bbca12c48e6ef",
+    "required_requirements": [
+      "answer_json:parse",
+      "answer_json:0:keys",
+      "answer_json:0:type",
+      "answer_json:1:equals",
+      "answer_json:2:equals",
+      "answer_json:3:forbidden_substrings",
+      "answer_json:3:forbidden_suffix",
+      "answer_json:3:max_length",
+      "answer_json:3:min_length",
+      "answer_json:3:type",
+      "answer_json:4:equals",
+      "answer_json:5:equals",
+      "tool_calls:count"
+    ],
+    "covered_requirements": [
+      "answer_json:0:keys",
+      "answer_json:0:type",
+      "answer_json:1:equals",
+      "answer_json:2:equals",
+      "answer_json:3:forbidden_substrings",
+      "answer_json:3:forbidden_suffix",
+      "answer_json:3:max_length",
+      "answer_json:3:min_length",
+      "answer_json:3:type",
+      "answer_json:4:equals",
+      "answer_json:5:equals",
+      "answer_json:parse",
+      "tool_calls:count"
+    ],
+    "missing_requirements": [],
+    "cases": [
+      {
+        "id": "known-good",
+        "kind": "known-good",
+        "response_digest": "4515245a5833fd1a899f1eb82f78dfa9e913082e65d7d44d21322cda7b19ecff",
+        "expected": "PASS",
+        "status": "PASS",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": []
+      },
+      {
+        "id": "allowed-alternative",
+        "kind": "allowed-alternative",
+        "response_digest": "392f3168baa062f3bb1b2f7440903b2865256705b9b6f39e299cc2b8df408d5a",
+        "expected": "PASS",
+        "status": "PASS",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": []
+      },
+      {
+        "id": "invalid-json",
+        "kind": "negative",
+        "response_digest": "caaeca30e582a62842e044d532b9ca4babfa74ca1ed29b3c1c8e9bdccb97976a",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:parse"
+        ],
+        "observed_violations": [
+          "answer_json:parse"
+        ],
+        "failures": [
+          "JSON output format: expected \"one strict JSON value without duplicate keys or surrounding prose\"; observed \"invalid JSON\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-0-keys",
+        "kind": "negative",
+        "response_digest": "41c042fcd521df7266794a218b810fec82d290c11bcbd4ab701ab8595d5c82d0",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:0:keys"
+        ],
+        "observed_violations": [
+          "answer_json:0:keys"
+        ],
+        "failures": [
+          "JSON field / keys: expected {\"keys\": [\"type\", \"scope\", \"subject\", \"footer\", \"breaking\"]}; observed {\"breaking\": false, \"footer\": \"Refs #42\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"type\": \"ref\", \"unexpected\": \"not requested\"}"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-0-type",
+        "kind": "negative",
+        "response_digest": "757d320e1efad4a62fdf55640aa69b0c00745deeb55b0475a4959df47a04ac20",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:0:type"
+        ],
+        "observed_violations": [
+          "answer_json:0:keys",
+          "answer_json:0:type",
+          "answer_json:1:equals",
+          "answer_json:2:equals",
+          "answer_json:3:forbidden_substrings",
+          "answer_json:3:forbidden_suffix",
+          "answer_json:3:max_length",
+          "answer_json:3:min_length",
+          "answer_json:3:type",
+          "answer_json:4:equals",
+          "answer_json:5:equals"
+        ],
+        "failures": [
+          "JSON field / keys: expected {\"keys\": [\"type\", \"scope\", \"subject\", \"footer\", \"breaking\"]}; observed []",
+          "JSON field / type: expected {\"type\": \"object\"}; observed []",
+          "JSON field /type equals: expected {\"equals\": \"ref\"}; observed {\"missing_path\": \"/type\"}",
+          "JSON field /scope equals: expected {\"equals\": \"cache\"}; observed {\"missing_path\": \"/scope\"}",
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject forbidden_suffix: expected {\"forbidden_suffix\": \".\"}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject max_length: expected {\"max_length\": 70}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject min_length: expected {\"min_length\": 1}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /subject type: expected {\"type\": \"string\"}; observed {\"missing_path\": \"/subject\"}",
+          "JSON field /footer equals: expected {\"equals\": \"Refs #42\"}; observed {\"missing_path\": \"/footer\"}",
+          "JSON field /breaking equals: expected {\"equals\": false}; observed {\"missing_path\": \"/breaking\"}"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-1-equals",
+        "kind": "negative",
+        "response_digest": "b6cc636c8bf06e079912e7723a06e177f128d80a3760e48d7bbcd591e0bb1bc9",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:1:equals"
+        ],
+        "observed_violations": [
+          "answer_json:1:equals"
+        ],
+        "failures": [
+          "JSON field /type equals: expected {\"equals\": \"ref\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-2-equals",
+        "kind": "negative",
+        "response_digest": "74ee9c2d267f5c1ff1bfc332d6fef1f50eedf0c1afb39db559a56a20f6f6a515",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:2:equals"
+        ],
+        "observed_violations": [
+          "answer_json:2:equals"
+        ],
+        "failures": [
+          "JSON field /scope equals: expected {\"equals\": \"cache\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-forbidden-substrings",
+        "kind": "negative",
+        "response_digest": "5ce8960b627fc53ef2c9a5aaf7cadf81ddde26f3a24fdf39757c8adae978dfc3",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed \"Extract shared cache-key normalization\\nExtra line\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "subject-carriage-return",
+        "kind": "negative",
+        "response_digest": "f989de017325104f1f1548b2f308a6a5f6598a9cad2cec563474b626e6dd32fd",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_substrings"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed \"Extract shared cache-key normalization\\rExtra line\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-forbidden-suffix",
+        "kind": "negative",
+        "response_digest": "e0279c9cf88074b6de1e5ed489e616148897070fd38bcefe887350be718f6898",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:forbidden_suffix"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_suffix"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_suffix: expected {\"forbidden_suffix\": \".\"}; observed \"Extract shared cache-key normalization.\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-max-length",
+        "kind": "negative",
+        "response_digest": "85975d09e5fd7100512fd2e0ba8dc6ae40e794c708fc399fda8507e280243613",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:max_length"
+        ],
+        "observed_violations": [
+          "answer_json:3:max_length"
+        ],
+        "failures": [
+          "JSON field /subject max_length: expected {\"max_length\": 70}; observed \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-min-length",
+        "kind": "negative",
+        "response_digest": "3e9640d64a9ec5cf74f11fd74d18da1e6eed538634ced42c04f168b6c8bcafb7",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:min_length"
+        ],
+        "observed_violations": [
+          "answer_json:3:min_length"
+        ],
+        "failures": [
+          "JSON field /subject min_length: expected {\"min_length\": 1}; observed \"\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-type",
+        "kind": "negative",
+        "response_digest": "aa10da5e506413f41856f8f5a9f247b5304917be22307dac36869909dffe1eb7",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:type"
+        ],
+        "observed_violations": [
+          "answer_json:3:forbidden_substrings",
+          "answer_json:3:forbidden_suffix",
+          "answer_json:3:max_length",
+          "answer_json:3:min_length",
+          "answer_json:3:type"
+        ],
+        "failures": [
+          "JSON field /subject forbidden_substrings: expected {\"forbidden_substrings\": [\"\\n\", \"\\r\"]}; observed 17",
+          "JSON field /subject forbidden_suffix: expected {\"forbidden_suffix\": \".\"}; observed 17",
+          "JSON field /subject max_length: expected {\"max_length\": 70}; observed 17",
+          "JSON field /subject min_length: expected {\"min_length\": 1}; observed 17",
+          "JSON field /subject type: expected {\"type\": \"string\"}; observed 17"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-4-equals",
+        "kind": "negative",
+        "response_digest": "a892d3c92be1f71b0b692fd61ba7535e89f3cc7ce61b931ce4037fee12ae0e72",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:4:equals"
+        ],
+        "observed_violations": [
+          "answer_json:4:equals"
+        ],
+        "failures": [
+          "JSON field /footer equals: expected {\"equals\": \"Refs #42\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-5-equals",
+        "kind": "negative",
+        "response_digest": "0fba837e2f3fded991309be3ed9f13819bb363d84b798e7e6c4ba244af8e463c",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:5:equals"
+        ],
+        "observed_violations": [
+          "answer_json:5:equals"
+        ],
+        "failures": [
+          "JSON field /breaking equals: expected {\"equals\": false}; observed true"
+        ],
+        "errors": []
+      },
+      {
+        "id": "unexpected-tool-call",
+        "kind": "negative",
+        "response_digest": "fe863804630e0031e0403ee1d78eb1ff0909764ddfcb035142c81891161f1328",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "tool_calls:count"
+        ],
+        "observed_violations": [
+          "tool_calls:count"
+        ],
+        "failures": [
+          "Tool call count: expected 0; observed 1"
+        ],
+        "errors": []
+      },
+      {
+        "id": "incomplete",
+        "kind": "incomplete",
+        "response_digest": "ca9ed4c02bdf78e85bd977c44561a018f9bbb6317681266b904a97f90152933a",
+        "expected": "FAULT",
+        "status": "FAULT",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": [
+          "Runtime did not complete"
+        ]
+      }
+    ],
+    "model_calls": 0,
+    "semantic_validation": false
+  },
+  "collision-plan": {
+    "version": 1,
+    "kind": "structured",
+    "passed": true,
+    "contract_digest": "021182de1b53306aaaedfe954b1f9243b8650c5a17ed4223c6f92ec107d2ab06",
+    "controls_digest": "38b6945cae8b43c50d734c77cddcb0684df9e6e6ebdd2f930c79956c48579fa6",
+    "grader_sha256": "6d1db19f73453a48afd224242e9dc23462939fcb5db242ecd37bbca12c48e6ef",
+    "required_requirements": [
+      "answer_json:parse",
+      "answer_json:0:keys",
+      "answer_json:0:type",
+      "answer_json:1:equals",
+      "answer_json:2:equals",
+      "answer_json:3:one_of",
+      "tool_calls:count"
+    ],
+    "covered_requirements": [
+      "answer_json:0:keys",
+      "answer_json:0:type",
+      "answer_json:1:equals",
+      "answer_json:2:equals",
+      "answer_json:3:one_of",
+      "answer_json:parse",
+      "tool_calls:count"
+    ],
+    "missing_requirements": [],
+    "cases": [
+      {
+        "id": "known-good",
+        "kind": "known-good",
+        "response_digest": "5bd6748128f2071799c949034a6d74adfcc5b1821c588c8267947aa5d07e2030",
+        "expected": "PASS",
+        "status": "PASS",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": []
+      },
+      {
+        "id": "allowed-alternative",
+        "kind": "allowed-alternative",
+        "response_digest": "c93ebb548836544ff16672a43d861a906ae6c479d26d6a73d33c13ad932070cd",
+        "expected": "PASS",
+        "status": "PASS",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": []
+      },
+      {
+        "id": "invalid-json",
+        "kind": "negative",
+        "response_digest": "caaeca30e582a62842e044d532b9ca4babfa74ca1ed29b3c1c8e9bdccb97976a",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:parse"
+        ],
+        "observed_violations": [
+          "answer_json:parse"
+        ],
+        "failures": [
+          "JSON output format: expected \"one strict JSON value without duplicate keys or surrounding prose\"; observed \"invalid JSON\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-0-keys",
+        "kind": "negative",
+        "response_digest": "e962b919854ac5cbe20a6c9e344726c6f761190b75130067dc25199914524432",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:0:keys"
+        ],
+        "observed_violations": [
+          "answer_json:0:keys"
+        ],
+        "failures": [
+          "JSON field / keys: expected {\"keys\": [\"base\", \"branch\", \"command\"]}; observed {\"base\": \"feat/batch-cache-refresh\", \"branch\": \"fix/retry-cache-lookup-3\", \"command\": \"git checkout -b fix/retry-cache-lookup-3\", \"unexpected\": \"not requested\"}"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-0-type",
+        "kind": "negative",
+        "response_digest": "757d320e1efad4a62fdf55640aa69b0c00745deeb55b0475a4959df47a04ac20",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:0:type"
+        ],
+        "observed_violations": [
+          "answer_json:0:keys",
+          "answer_json:0:type",
+          "answer_json:1:equals",
+          "answer_json:2:equals",
+          "answer_json:3:one_of"
+        ],
+        "failures": [
+          "JSON field / keys: expected {\"keys\": [\"base\", \"branch\", \"command\"]}; observed []",
+          "JSON field / type: expected {\"type\": \"object\"}; observed []",
+          "JSON field /base equals: expected {\"equals\": \"feat/batch-cache-refresh\"}; observed {\"missing_path\": \"/base\"}",
+          "JSON field /branch equals: expected {\"equals\": \"fix/retry-cache-lookup-3\"}; observed {\"missing_path\": \"/branch\"}",
+          "JSON field /command one_of: expected {\"one_of\": [\"git checkout -b fix/retry-cache-lookup-3\", \"git switch -c fix/retry-cache-lookup-3\"]}; observed {\"missing_path\": \"/command\"}"
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-1-equals",
+        "kind": "negative",
+        "response_digest": "16e25cadd8e991e163258b81527395ce9a25b1cc1de7c6ae7802878aad748143",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:1:equals"
+        ],
+        "observed_violations": [
+          "answer_json:1:equals"
+        ],
+        "failures": [
+          "JSON field /base equals: expected {\"equals\": \"feat/batch-cache-refresh\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-2-equals",
+        "kind": "negative",
+        "response_digest": "08f4f46b1c82866942963e5fa6c423e917b7c4ecae742a4375ed79c78c302a1d",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:2:equals"
+        ],
+        "observed_violations": [
+          "answer_json:2:equals"
+        ],
+        "failures": [
+          "JSON field /branch equals: expected {\"equals\": \"fix/retry-cache-lookup-3\"}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "assertion-3-one-of",
+        "kind": "negative",
+        "response_digest": "9ea06b6b90d82d31e284539e8476699ef665e6ef6953361fd50159bffd4328ae",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "answer_json:3:one_of"
+        ],
+        "observed_violations": [
+          "answer_json:3:one_of"
+        ],
+        "failures": [
+          "JSON field /command one_of: expected {\"one_of\": [\"git checkout -b fix/retry-cache-lookup-3\", \"git switch -c fix/retry-cache-lookup-3\"]}; observed \"incorrect-value\""
+        ],
+        "errors": []
+      },
+      {
+        "id": "unexpected-tool-call",
+        "kind": "negative",
+        "response_digest": "aec9bde1b112318c2ee937eb0eb81a0ef58029663d0456d11c3eb9cb11eba145",
+        "expected": "FAIL",
+        "status": "FAIL",
+        "matched": true,
+        "targeted_violations": [
+          "tool_calls:count"
+        ],
+        "observed_violations": [
+          "tool_calls:count"
+        ],
+        "failures": [
+          "Tool call count: expected 0; observed 1"
+        ],
+        "errors": []
+      },
+      {
+        "id": "incomplete",
+        "kind": "incomplete",
+        "response_digest": "a4aa0826f7a32797beb44f0853b6203e9ab472dc24e086930edfaeb4154348eb",
+        "expected": "FAULT",
+        "status": "FAULT",
+        "matched": true,
+        "targeted_violations": [],
+        "observed_violations": [],
+        "failures": [],
+        "errors": [
+          "Runtime did not complete"
+        ]
+      }
+    ],
+    "model_calls": 0,
+    "semantic_validation": false
+  }
+}

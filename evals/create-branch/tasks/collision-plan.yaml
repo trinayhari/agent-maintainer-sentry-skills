@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "id": "collision-plan",
+  "state": "accepted",
+  "prompt": "Plan the branch creation from the supplied repository facts; do not execute commands or run tools. This change fixes a cache lookup retry that currently fails. Use the short description retry-cache-lookup exactly. Current branch: feat/batch-cache-refresh. Default branch: main. Existing local branches: main, feat/batch-cache-refresh, fix/retry-cache-lookup. Existing origin branches: main, fix/retry-cache-lookup-2. There are no other branches and the worktree is clean. I have not requested a switch to the default branch. Return only one JSON object with exactly base, branch, and command, all strings. base is the branch from which the new branch will be created; branch is the final collision-free name; command is the single git command to create and switch to that branch. No Markdown fences.",
+  "tools": [
+    {
+      "name": "activate_skill"
+    }
+  ],
+  "checks": {
+    "required_tools": [],
+    "forbidden_tools": [
+      "remediate"
+    ],
+    "semantic": true,
+    "structured": {
+      "answer_json": {
+        "assertions": [
+          {
+            "path": "",
+            "type": "object",
+            "keys": [
+              "base",
+              "branch",
+              "command"
+            ]
+          },
+          {
+            "path": "/base",
+            "equals": "feat/batch-cache-refresh"
+          },
+          {
+            "path": "/branch",
+            "equals": "fix/retry-cache-lookup-3"
+          },
+          {
+            "path": "/command",
+            "one_of": [
+              "git checkout -b fix/retry-cache-lookup-3",
+              "git switch -c fix/retry-cache-lookup-3"
+            ]
+          }
+        ]
+      },
+      "tool_calls": []
+    }
+  }
+}

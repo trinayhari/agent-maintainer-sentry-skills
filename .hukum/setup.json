@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "repository": "trinayhari/agent-maintainer-sentry-skills",
+  "evaluator_repository": "trinayhari/agent-maintainer",
+  "evaluator_revision": "1765da292ff47a8eb4ec981da5b9fb49e5a3e94a",
+  "canonical_workflow_sha256": "0152cdb4ad99acd49b6ced7cd51ee856fe31c3f0373c9e71e4c4d526d43d1acd",
+  "adapter_sha256": "e0d9dd52ef181c6ae729e0276991b47b2077dded60f6e763df01c73814a86d64",
+  "deploy_key_secret_name": "MAINTAINER_READ_KEY",
+  "environment": "aws-evaluation",
+  "enabled": false,
+  "policy_accepted": false,
+  "required_environment_variables": [
+    "AWS_REGION",
+    "HUKUM_EVALUATOR_ROLE_ARN",
+    "HUKUM_AWS_SETTINGS_JSON",
+    "HUKUM_APPROVAL_JSON"
+  ],
+  "required_repository_variables": [
+    "HUKUM_ENABLE_LIVE_PR"
+  ],
+  "expected_oidc_subject": "repo:trinayhari/agent-maintainer-sentry-skills:environment:aws-evaluation"
+}

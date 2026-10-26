@@ -1,0 +1,929 @@
+{
+  "fix-null-response": [
+    {
+      "id": "known-good",
+      "kind": "known-good",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    },
+    {
+      "id": "allowed-alternative",
+      "kind": "allowed-alternative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\n  \"breaking\": false,\n  \"footer\": \"Fixes #73\",\n  \"scope\": \"api\",\n  \"subject\": \"Handle deleted accounts without a server error\",\n  \"type\": \"fix\"\n}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    },
+    {
+      "id": "invalid-json",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{not-json}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:parse"
+      ]
+    },
+    {
+      "id": "assertion-0-keys",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": false, \"unexpected\": \"not requested\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:0:keys"
+      ]
+    },
+    {
+      "id": "assertion-0-type",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "[]",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:0:type"
+      ]
+    },
+    {
+      "id": "assertion-1-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"incorrect-value\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:1:equals"
+      ]
+    },
+    {
+      "id": "assertion-2-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"incorrect-value\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:2:equals"
+      ]
+    },
+    {
+      "id": "assertion-3-forbidden-substrings",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\\nExtra line\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:forbidden_substrings"
+      ]
+    },
+    {
+      "id": "subject-carriage-return",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\\rExtra line\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:forbidden_substrings"
+      ]
+    },
+    {
+      "id": "assertion-3-forbidden-suffix",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups.\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:forbidden_suffix"
+      ]
+    },
+    {
+      "id": "assertion-3-max-length",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:max_length"
+      ]
+    },
+    {
+      "id": "assertion-3-min-length",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:min_length"
+      ]
+    },
+    {
+      "id": "assertion-3-type",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": 17, \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:type"
+      ]
+    },
+    {
+      "id": "assertion-4-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"incorrect-value\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:4:equals"
+      ]
+    },
+    {
+      "id": "assertion-5-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": true}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:5:equals"
+      ]
+    },
+    {
+      "id": "unexpected-tool-call",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [
+          {
+            "sequence": 1,
+            "tool": "activate_skill",
+            "arguments": {
+              "name": "commit"
+            }
+          }
+        ],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "tool_calls:count"
+      ]
+    },
+    {
+      "id": "incomplete",
+      "kind": "incomplete",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": false,
+        "error": "Synthetic interrupted response",
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    }
+  ],
+  "refactor-link": [
+    {
+      "id": "known-good",
+      "kind": "known-good",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    },
+    {
+      "id": "allowed-alternative",
+      "kind": "allowed-alternative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\n  \"breaking\": false,\n  \"footer\": \"Refs #42\",\n  \"scope\": \"cache\",\n  \"subject\": \"Consolidate cache-key normalization in a shared helper\",\n  \"type\": \"ref\"\n}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    },
+    {
+      "id": "invalid-json",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{not-json}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:parse"
+      ]
+    },
+    {
+      "id": "assertion-0-keys",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": false, \"unexpected\": \"not requested\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:0:keys"
+      ]
+    },
+    {
+      "id": "assertion-0-type",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "[]",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:0:type"
+      ]
+    },
+    {
+      "id": "assertion-1-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"incorrect-value\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:1:equals"
+      ]
+    },
+    {
+      "id": "assertion-2-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"incorrect-value\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:2:equals"
+      ]
+    },
+    {
+      "id": "assertion-3-forbidden-substrings",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\\nExtra line\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:forbidden_substrings"
+      ]
+    },
+    {
+      "id": "subject-carriage-return",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\\rExtra line\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:forbidden_substrings"
+      ]
+    },
+    {
+      "id": "assertion-3-forbidden-suffix",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization.\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:forbidden_suffix"
+      ]
+    },
+    {
+      "id": "assertion-3-max-length",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:max_length"
+      ]
+    },
+    {
+      "id": "assertion-3-min-length",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:min_length"
+      ]
+    },
+    {
+      "id": "assertion-3-type",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": 17, \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:type"
+      ]
+    },
+    {
+      "id": "assertion-4-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"incorrect-value\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:4:equals"
+      ]
+    },
+    {
+      "id": "assertion-5-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": true}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:5:equals"
+      ]
+    },
+    {
+      "id": "unexpected-tool-call",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [
+          {
+            "sequence": 1,
+            "tool": "activate_skill",
+            "arguments": {
+              "name": "commit"
+            }
+          }
+        ],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "tool_calls:count"
+      ]
+    },
+    {
+      "id": "incomplete",
+      "kind": "incomplete",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": false,
+        "error": "Synthetic interrupted response",
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    }
+  ],
+  "collision-plan": [
+    {
+      "id": "known-good",
+      "kind": "known-good",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"base\": \"feat/batch-cache-refresh\", \"branch\": \"fix/retry-cache-lookup-3\", \"command\": \"git checkout -b fix/retry-cache-lookup-3\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    },
+    {
+      "id": "allowed-alternative",
+      "kind": "allowed-alternative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\n  \"base\": \"feat/batch-cache-refresh\",\n  \"branch\": \"fix/retry-cache-lookup-3\",\n  \"command\": \"git switch -c fix/retry-cache-lookup-3\"\n}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    },
+    {
+      "id": "invalid-json",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{not-json}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:parse"
+      ]
+    },
+    {
+      "id": "assertion-0-keys",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"base\": \"feat/batch-cache-refresh\", \"branch\": \"fix/retry-cache-lookup-3\", \"command\": \"git checkout -b fix/retry-cache-lookup-3\", \"unexpected\": \"not requested\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:0:keys"
+      ]
+    },
+    {
+      "id": "assertion-0-type",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "[]",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:0:type"
+      ]
+    },
+    {
+      "id": "assertion-1-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"base\": \"incorrect-value\", \"branch\": \"fix/retry-cache-lookup-3\", \"command\": \"git checkout -b fix/retry-cache-lookup-3\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:1:equals"
+      ]
+    },
+    {
+      "id": "assertion-2-equals",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"base\": \"feat/batch-cache-refresh\", \"branch\": \"incorrect-value\", \"command\": \"git checkout -b fix/retry-cache-lookup-3\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:2:equals"
+      ]
+    },
+    {
+      "id": "assertion-3-one-of",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"base\": \"feat/batch-cache-refresh\", \"branch\": \"fix/retry-cache-lookup-3\", \"command\": \"incorrect-value\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "answer_json:3:one_of"
+      ]
+    },
+    {
+      "id": "unexpected-tool-call",
+      "kind": "negative",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"base\": \"feat/batch-cache-refresh\", \"branch\": \"fix/retry-cache-lookup-3\", \"command\": \"git checkout -b fix/retry-cache-lookup-3\"}",
+        "trace": [
+          {
+            "sequence": 1,
+            "tool": "activate_skill",
+            "arguments": {
+              "name": "create-branch"
+            }
+          }
+        ],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "violates": [
+        "tool_calls:count"
+      ]
+    },
+    {
+      "id": "incomplete",
+      "kind": "incomplete",
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": false,
+        "error": "Synthetic interrupted response",
+        "answer": "{\"base\": \"feat/batch-cache-refresh\", \"branch\": \"fix/retry-cache-lookup-3\", \"command\": \"git checkout -b fix/retry-cache-lookup-3\"}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      }
+    }
+  ]
+}

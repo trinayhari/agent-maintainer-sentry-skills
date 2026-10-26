@@ -1,0 +1,82 @@
+{
+  "refactor-link": [
+    {
+      "id": "accurate-subject",
+      "expected_semantic_pass": true,
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Extract shared cache-key normalization\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "reason": "Accurately describes the supplied change; this wording is an example, not the only acceptable subject."
+    },
+    {
+      "id": "unsupported-subject",
+      "expected_semantic_pass": false,
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"ref\", \"scope\": \"cache\", \"subject\": \"Speed up cache lookups with a new eviction policy\", \"footer\": \"Refs #42\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "reason": "The subject describes functionality or a performance benefit absent from the supplied change. All structured constraints remain satisfied."
+    }
+  ],
+  "fix-null-response": [
+    {
+      "id": "accurate-subject",
+      "expected_semantic_pass": true,
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Return 404 for deleted account lookups\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "reason": "Accurately describes the supplied change; this wording is an example, not the only acceptable subject."
+    },
+    {
+      "id": "unsupported-subject",
+      "expected_semantic_pass": false,
+      "response": {
+        "version": 1,
+        "execution_mode": "synthetic",
+        "completed": true,
+        "error": null,
+        "answer": "{\"type\": \"fix\", \"scope\": \"api\", \"subject\": \"Add account export endpoints\", \"footer\": \"Fixes #73\", \"breaking\": false}",
+        "trace": [],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0
+        },
+        "activated_skills": [],
+        "final_state": {}
+      },
+      "reason": "The subject describes functionality or a performance benefit absent from the supplied change. All structured constraints remain satisfied."
+    }
+  ]
+}

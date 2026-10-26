@@ -1,0 +1,9 @@
+# hukum external-repository onboarding
+
+This is an inactive, review-only setup. It does not approve tasks, enable paid runs, or prove end-to-end operation. Existing workflows and skills are preserved.
+
+The workflow checks out **trinayhari/agent-maintainer@1765da292ff47a8eb4ec981da5b9fb49e5a3e94a** using the read-only `MAINTAINER_READ_KEY` deploy-key secret. No private evaluator source is copied into this repository. The PR checkout is capability data only. Evaluator and publisher jobs have separate permissions; the Lambda agent receives neither the deploy key nor private grading criteria. Browser dependencies are installed only for selected HTML checks; semantic judging remains controlled independently by each accepted task contract.
+
+Before enabling: review and merge this setup, validate the representative task suite, configure the protected `aws-evaluation` environment for `main`, confirm the deploy key can read the exact pinned evaluator commit, and install a scoped AWS evaluator role trusting exactly `repo:trinayhari/agent-maintainer-sentry-skills:environment:aws-evaluation`. Do not broaden the existing evaluator role to arbitrary repositories. Prepare an accepted version-two task policy for **this repository**, this evaluator fingerprint, and the selected immutable runtime/model. The policy must remain on the trusted side, outside the skill bundle. Store the four variables listed in `setup.json` in the environment. Set repository variable `HUKUM_ENABLE_LIVE_PR=true` only after those checks.
+
+Review existing automation before opening a test PR: older live workflows may independently consume budget. Do not silently remove or disable them. After setup, open a same-repository non-draft skill-only PR against `main`, then verify the actual Actions run, two live arms, matching HTML/JSON artifacts and current-revision comment. Exercise an update, cancellation, stale publication rejection and recovery before claiming production readiness.
